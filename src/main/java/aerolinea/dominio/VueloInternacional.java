@@ -1,79 +1,90 @@
-/**
- * @file VueloInternacional.java
- * @brief Declares VueloInternacional as part of the airline domain model.
- * @details This source file belongs to the Programacion II academic project.
- */
-
 package aerolinea.dominio;
 
-/**
- * @class VueloInternacional
- * @brief Representa un vuelo realizado hacia otro pais.
- */
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+
+@PersistenceCapable(table = "VUELOS_INTERNACIONALES")
+@Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 public class VueloInternacional extends Vuelo {
 
     private static final long serialVersionUID = 1L;
 
+    @Persistent
+    @Column(name = "PAIS_DESTINO", length = 100)
     private String paisDestino;
+
+    @Persistent
+    @Column(name = "REQUIERE_PASAPORTE")
     private boolean requierePasaporte;
 
-    /**
-     * @brief Crea un vuelo internacional.
-     * @param numero Numero del vuelo.
-     * @param origen Origen del vuelo.
-     * @param destino Destino del vuelo.
-     * @param fecha Fecha del vuelo.
-     * @param capacidad Capacidad maxima de pasajeros.
-     * @param paisDestino Pais de destino.
-     * @param requierePasaporte Indica si se requiere pasaporte.
-     */
-    public VueloInternacional(String numero, String origen, String destino, String fecha, int capacidad,
-                              String paisDestino, boolean requierePasaporte) {
-        super(numero, origen, destino, fecha, capacidad);
+    protected VueloInternacional() {
+        super();
+    }
+
+    public VueloInternacional(
+            String numero,
+            String origen,
+            String destino,
+            String fecha,
+            int capacidad,
+            String paisDestino,
+            boolean requierePasaporte) {
+
+        super(
+                numero,
+                origen,
+                destino,
+                fecha,
+                capacidad);
+
         setPaisDestino(paisDestino);
-        this.requierePasaporte = requierePasaporte;
+        this.requierePasaporte =
+                requierePasaporte;
     }
 
     public String getPaisDestino() {
         return paisDestino;
     }
 
-    /**
-     * @brief Establece el pais de destino del vuelo internacional.
-     * @param paisDestino Nombre del pais de destino.
-     * @throws IllegalArgumentException Si el nombre del pais es invalido.
-     */
     public void setPaisDestino(String paisDestino) {
-        if (paisDestino == null || paisDestino.trim().isEmpty()) {
-            throw new IllegalArgumentException("El pais de destino no puede estar vacio.");
+        if (paisDestino == null
+                || paisDestino.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "El pais de destino "
+                            + "no puede estar vacio.");
         }
-        this.paisDestino = paisDestino.trim();
+
+        this.paisDestino =
+                paisDestino.trim();
     }
 
     public boolean isRequierePasaporte() {
         return requierePasaporte;
     }
 
-    public void setRequierePasaporte(boolean requierePasaporte) {
-        this.requierePasaporte = requierePasaporte;
+    public void setRequierePasaporte(
+            boolean requierePasaporte) {
+
+        this.requierePasaporte =
+                requierePasaporte;
     }
 
-    /**
-     * @brief Devuelve el tipo concreto del vuelo.
-     * @return Texto "Internacional".
-     */
     @Override
     public String getTipo() {
         return "Internacional";
     }
 
-    /**
-     * @brief Devuelve informacion especifica del vuelo internacional.
-     * @return Detalle del vuelo internacional.
-     */
     @Override
     protected String obtenerDetalleAdicional() {
-        return "Pais destino: " + paisDestino
-                + " | Requiere pasaporte: " + (requierePasaporte ? "Si" : "No");
+        return "Pais destino: "
+                + paisDestino
+                + " | Requiere pasaporte: "
+                + (requierePasaporte
+                ? "Si"
+                : "No");
     }
 }

@@ -1,82 +1,74 @@
-/**
- * @file Tripulante.java
- * @brief Declares Tripulante as part of the airline domain model.
- * @details This source file belongs to the Programacion II academic project.
- */
-
 package aerolinea.dominio;
 
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+
 /**
- * @class Tripulante
- * @brief Representa a una persona que forma parte de la tripulacion.
+ * Representa a una persona que forma parte de la tripulacion.
  */
+@PersistenceCapable(table = "TRIPULANTES")
+@Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 public class Tripulante extends Persona {
 
     private static final long serialVersionUID = 1L;
 
+    @Persistent
+    @Column(name = "LEGAJO")
     private int legajo;
+
+    @Persistent
+    @Column(name = "ROL", length = 100)
     private String rol;
 
-    /**
-     * @brief Crea un tripulante.
-     * @param dni DNI del tripulante.
-     * @param nombre Nombre del tripulante.
-     * @param apellido Apellido del tripulante.
-     * @param legajo Legajo interno del tripulante.
-     * @param rol Rol o funcion dentro del vuelo.
-     */
-    public Tripulante(int dni, String nombre, String apellido, int legajo, String rol) {
+    protected Tripulante() {
+        super();
+    }
+
+    public Tripulante(
+            int dni,
+            String nombre,
+            String apellido,
+            int legajo,
+            String rol) {
+
         super(dni, nombre, apellido);
         setLegajo(legajo);
         setRol(rol);
     }
 
-    /**
-     * @brief Obtiene el legajo del tripulante.
-     * @return Legajo del tripulante.
-     */
     public int getLegajo() {
         return legajo;
     }
 
-    /**
-     * @brief Modifica el legajo del tripulante.
-     * @param legajo Nuevo legajo.
-     */
     public void setLegajo(int legajo) {
         if (legajo <= 0) {
-            throw new IllegalArgumentException("El legajo debe ser mayor que cero.");
+            throw new IllegalArgumentException(
+                    "El legajo debe ser mayor que cero.");
         }
         this.legajo = legajo;
     }
 
-    /**
-     * @brief Obtiene el rol del tripulante.
-     * @return Rol del tripulante.
-     */
     public String getRol() {
         return rol;
     }
 
-    /**
-     * @brief Modifica el rol del tripulante.
-     * @param rol Nuevo rol.
-     */
     public void setRol(String rol) {
         if (rol == null || rol.trim().isEmpty()) {
-            throw new IllegalArgumentException("El rol no puede estar vacio.");
+            throw new IllegalArgumentException(
+                    "El rol no puede estar vacio.");
         }
         this.rol = rol.trim();
     }
 
-    /**
-     * @brief Muestra por consola los datos del tripulante.
-     */
     @Override
     public void mostrarInfo() {
-        System.out.println("Tripulante: " + getNombreCompleto()
-                + " | DNI: " + getDni()
-                + " | Legajo: " + legajo
-                + " | Rol: " + rol);
+        System.out.println(
+                "Tripulante: " + getNombreCompleto()
+                        + " | DNI: " + getDni()
+                        + " | Legajo: " + legajo
+                        + " | Rol: " + rol);
     }
 }

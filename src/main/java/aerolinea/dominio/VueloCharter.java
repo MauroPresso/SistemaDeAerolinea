@@ -1,36 +1,48 @@
-/**
- * @file VueloCharter.java
- * @brief Declares VueloCharter as part of the airline domain model.
- * @details This source file belongs to the Programacion II academic project.
- */
-
 package aerolinea.dominio;
 
-/**
- * @class VueloCharter
- * @brief Representa un vuelo contratado para una operacion especial.
- */
+import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+
+@PersistenceCapable(table = "VUELOS_CHARTER")
+@Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 public class VueloCharter extends Vuelo {
 
     private static final long serialVersionUID = 1L;
 
+    @Persistent
+    @Column(name = "EMPRESA_CONTRATANTE", length = 150)
     private String empresaContratante;
+
+    @Persistent
+    @Column(name = "COSTO_TOTAL")
     private double costoTotal;
 
-    /**
-     * @brief Crea un vuelo charter.
-     * @param numero Numero del vuelo.
-     * @param origen Origen del vuelo.
-     * @param destino Destino del vuelo.
-     * @param fecha Fecha del vuelo.
-     * @param capacidad Capacidad maxima de pasajeros.
-     * @param empresaContratante Empresa o entidad contratante.
-     * @param costoTotal Costo total del vuelo charter.
-     */
-    public VueloCharter(String numero, String origen, String destino, String fecha, int capacidad,
-                        String empresaContratante, double costoTotal) {
-        super(numero, origen, destino, fecha, capacidad);
-        setEmpresaContratante(empresaContratante);
+    protected VueloCharter() {
+        super();
+    }
+
+    public VueloCharter(
+            String numero,
+            String origen,
+            String destino,
+            String fecha,
+            int capacidad,
+            String empresaContratante,
+            double costoTotal) {
+
+        super(
+                numero,
+                origen,
+                destino,
+                fecha,
+                capacidad);
+
+        setEmpresaContratante(
+                empresaContratante);
+
         setCostoTotal(costoTotal);
     }
 
@@ -38,50 +50,45 @@ public class VueloCharter extends Vuelo {
         return empresaContratante;
     }
 
-    /**
-     * @brief Establece la empresa contratante del vuelo charter.
-     * @param empresaContratante Nombre de la empresa contratante.
-     * @throws IllegalArgumentException Si el nombre de la empresa es invalido.
-     */
-    public void setEmpresaContratante(String empresaContratante) {
-        if (empresaContratante == null || empresaContratante.trim().isEmpty()) {
-            throw new IllegalArgumentException("La empresa contratante no puede estar vacia.");
+    public void setEmpresaContratante(
+            String empresaContratante) {
+
+        if (empresaContratante == null
+                || empresaContratante.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "La empresa contratante "
+                            + "no puede estar vacia.");
         }
-        this.empresaContratante = empresaContratante.trim();
+
+        this.empresaContratante =
+                empresaContratante.trim();
     }
 
     public double getCostoTotal() {
         return costoTotal;
     }
 
-    /**
-     * @brief Establece el costo total del vuelo charter.
-     * @param costoTotal Costo total del vuelo.
-     * @throws IllegalArgumentException Si el costo total es negativo.
-     */
     public void setCostoTotal(double costoTotal) {
         if (costoTotal < 0) {
-            throw new IllegalArgumentException("El costo total no puede ser negativo.");
+            throw new IllegalArgumentException(
+                    "El costo total "
+                            + "no puede ser negativo.");
         }
+
         this.costoTotal = costoTotal;
     }
 
-    /**
-     * @brief Devuelve el tipo concreto del vuelo.
-     * @return Texto "Charter".
-     */
     @Override
     public String getTipo() {
         return "Charter";
     }
 
-    /**
-     * @brief Devuelve informacion especifica del vuelo charter.
-     * @return Detalle del vuelo charter.
-     */
     @Override
     protected String obtenerDetalleAdicional() {
-        return "Empresa contratante: " + empresaContratante
-                + " | Costo total: $" + costoTotal;
+        return "Empresa contratante: "
+                + empresaContratante
+                + " | Costo total: $"
+                + costoTotal;
     }
 }

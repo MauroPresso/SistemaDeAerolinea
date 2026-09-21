@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jdo>
+    <package name="ar.edu.ifes.aerolinea.orm">
+        <class name="VueloPersistente"
+               identity-type="datastore"
+               table="VUELOS">
+
+            <field name="numero" column="NUMERO"/>
+            <field name="origen" column="ORIGEN"/>
+            <field name="destino" column="DESTINO"/>
+        </class>
+    </package>
+</jdo>

@@ -7,6 +7,11 @@
 # Datos serializados generados por el programa
 /data/*.dat
 
+# Base H2 generada por el modo ORM
+/data/*.mv.db
+/data/*.trace.db
+/data/*.lock.db
+
 # Configuracion local de VS Code
 .vscode/
 
@@ -22,3 +27,11 @@ target/
 /docs/doxygen/latex/
 /docs/doxygen/xml/
 /docs/doxygen/doxygen-warnings.log
+
+# Bases H2 generadas en cualquier laboratorio
+**/data/*.mv.db
+**/data/*.trace.db
+**/data/*.lock.db
+
+# Backups locales
+*.backup

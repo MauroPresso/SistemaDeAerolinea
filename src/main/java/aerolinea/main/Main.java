@@ -1,9 +1,3 @@
-/**
- * @file Main.java
- * @brief Declares Main as part of application startup and dependency composition.
- * @details This source file belongs to the Programacion II academic project.
- */
-
 package aerolinea.main;
 
 import aerolinea.dominio.Aerolinea;
@@ -11,6 +5,8 @@ import aerolinea.dominio.Persona;
 import aerolinea.dominio.Vuelo;
 import aerolinea.repositorio.IRepositorio;
 import aerolinea.repositorio.RepositorioArchivo;
+import aerolinea.repositorio.RepositorioJdoPersona;
+import aerolinea.repositorio.RepositorioJdoVuelo;
 import aerolinea.servicio.Servicio;
 import aerolinea.ui.Menu;
 import aerolinea.ui.Ventana;
@@ -20,18 +16,53 @@ import java.util.Arrays;
 
 /**
  * Punto de entrada del Sistema de Aerolinea.
+ *
+ * <p>Modos de persistencia:</p>
+ * <ul>
+ *     <li>Por defecto: archivos .dat.</li>
+ *     <li>Con --orm: DataNucleus/JDO + H2.</li>
+ * </ul>
+ *
+ * <p>La opcion --consola puede combinarse con cualquiera de los dos modos.</p>
  */
 public class Main {
 
     public static void main(String[] args) {
 
-        IRepositorio<Vuelo> repositorioVuelos =
-                new RepositorioArchivo<>(
-                        "data/vuelos.dat");
+        boolean modoOrm =
+                Arrays.stream(args)
+                        .anyMatch(
+                                "--orm"::equalsIgnoreCase);
 
-        IRepositorio<Persona> repositorioPersonas =
-                new RepositorioArchivo<>(
-                        "data/personas.dat");
+        boolean modoConsola =
+                Arrays.stream(args)
+                        .anyMatch(
+                                "--consola"::equalsIgnoreCase);
+
+        IRepositorio<Vuelo> repositorioVuelos;
+        IRepositorio<Persona> repositorioPersonas;
+
+        if (modoOrm) {
+            repositorioVuelos =
+                    new RepositorioJdoVuelo();
+
+            repositorioPersonas =
+                    new RepositorioJdoPersona();
+
+            System.out.println(
+                    "Persistencia: DataNucleus/JDO + H2");
+        } else {
+            repositorioVuelos =
+                    new RepositorioArchivo<>(
+                            "data/vuelos.dat");
+
+            repositorioPersonas =
+                    new RepositorioArchivo<>(
+                            "data/personas.dat");
+
+            System.out.println(
+                    "Persistencia: archivos .dat");
+        }
 
         Servicio<Vuelo> servicioVuelos =
                 new Servicio<>(repositorioVuelos);
@@ -45,26 +76,23 @@ public class Main {
                         servicioVuelos.listar(),
                         servicioPersonas.listar());
 
-        boolean modoConsola =
-                Arrays.stream(args)
-                        .anyMatch(
-                                "--consola"::equalsIgnoreCase);
-
         if (modoConsola) {
-            Menu menu = new Menu(
-                    aerolinea,
-                    servicioVuelos,
-                    servicioPersonas);
+            Menu menu =
+                    new Menu(
+                            aerolinea,
+                            servicioVuelos,
+                            servicioPersonas);
 
             menu.iniciar();
             return;
         }
 
         SwingUtilities.invokeLater(() -> {
-            Ventana ventana = new Ventana(
-                    aerolinea,
-                    servicioVuelos,
-                    servicioPersonas);
+            Ventana ventana =
+                    new Ventana(
+                            aerolinea,
+                            servicioVuelos,
+                            servicioPersonas);
 
             ventana.setVisible(true);
         });

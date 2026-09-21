@@ -6,7 +6,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Coordenadas Maven del proyecto -->
     <groupId>ar.edu.ifes</groupId>
     <artifactId>sistema-de-aerolinea</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -19,26 +18,51 @@
     </description>
 
     <properties>
-        <!-- Java 17 se usa como nivel de compatibilidad de compilacion. -->
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <datanucleus.version>6.0.0-release</datanucleus.version>
+        <jdo.version>3.2.0-release</jdo.version>
+        <h2.version>2.3.232</h2.version>
     </properties>
 
-    <!--
-        En esta etapa el proyecto no necesita bibliotecas externas.
-        Las dependencias de testing (JUnit) se incorporaran cuando
-        construyamos los tests automatizados.
-    -->
     <dependencies>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>javax.jdo</artifactId>
+            <version>${jdo.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-core</artifactId>
+            <version>${datanucleus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-api-jdo</artifactId>
+            <version>${datanucleus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-rdbms</artifactId>
+            <version>${datanucleus.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <!-- Nombre pedagogicamente legible del artefacto generado. -->
         <finalName>SistemaDeAerolinea-${project.version}</finalName>
 
         <plugins>
-            <!-- Compila las fuentes Java durante las fases compile/test/package/etc. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -49,7 +73,59 @@
                 </configuration>
             </plugin>
 
-            <!-- Genera un JAR ejecutable indicando cual es el metodo main. -->
+            <!-- Unidad 3: enhancement JDO despues de compilar las clases. -->
+            <plugin>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>datanucleus-maven-plugin</artifactId>
+                <version>${datanucleus.version}</version>
+                <configuration>
+                    <api>JDO</api>
+                    <props>${project.basedir}/src/main/resources/datanucleus.properties</props>
+                    <verbose>true</verbose>
+                    <metadataIncludes>**/aerolinea/dominio/*.class</metadataIncludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>enhance-domain</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                IMPORTANTE:
+                DataNucleus usa un mecanismo de plugins y cada JAR conserva su
+                propio plugin.xml y MANIFEST.MF. No se fusionan los JARs.
+                En su lugar, las dependencias se copian a target/lib.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-runtime-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                JAR ejecutable con Class-Path apuntando a target/lib.
+                De este modo:
+                java -jar target/SistemaDeAerolinea-1.0-SNAPSHOT.jar
+                sigue funcionando sin convertir las dependencias en un fat JAR.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -58,6 +134,8 @@
                     <archive>
                         <manifest>
                             <mainClass>aerolinea.main.Main</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                     </archive>
                 </configuration>
